@@ -1,0 +1,123 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Enums as String types for SQLite compatibility
+
+model User {
+  id             Int       @id @default(autoincrement())
+  name           String
+  email          String    @unique
+  role           String    // UserRole: CEO, HR_MANAGER
+  passwordHash   String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  xpEvents       XpEvent[]
+  alertsResolved Alert[]   @relation("AlertResolvedBy")
+  payrollBatches PayrollBatch[]
+}
+
+model Branch {
+  id        Int        @id @default(autoincrement())
+  name      String
+  city      String?
+  status    String     @default("ACTIVE") // BranchStatus: ACTIVE, INACTIVE
+  employees Employee[]
+}
+
+model Employee {
+  id              Int                @id @default(autoincrement())
+  employeeCode    String             @unique
+  fullName        String
+  iqamaNumber     String?
+  nationality     String?
+  branch          Branch?            @relation(fields: [branchId], references: [id])
+  branchId        Int?
+  basicSalary     Float?
+  bankAccount     String?
+  hireDate        DateTime?
+  status          String             @default("ACTIVE") // EmployeeStatus: ACTIVE, INACTIVE, TERMINATED
+  documents       EmployeeDocument[]
+  payrollEntries  PayrollEntry[]
+  alerts          Alert[]
+  xpEvents        XpEvent[]
+}
+
+model EmployeeDocument {
+  id           Int      @id @default(autoincrement())
+  employee     Employee @relation(fields: [employeeId], references: [id])
+  employeeId   Int
+  documentType String   // DocumentType: IQAMA, CONTRACT, INSURANCE, LICENSE, BANK_LETTER, OTHER
+  fileUrl      String?
+  issueDate    DateTime?
+  expiryDate   DateTime?
+  isRequired   Boolean  @default(true)
+  status       String   @default("MISSING") // DocumentStatus: VALID, EXPIRED, MISSING, EXPIRING_SOON
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model PayrollBatch {
+  id                Int            @id @default(autoincrement())
+  month             DateTime
+  uploadedBy        User?          @relation(fields: [uploadedById], references: [id])
+  uploadedById      Int?
+  uploadedAt        DateTime       @default(now())
+  status            String         @default("DRAFT") // PayrollBatchStatus: DRAFT, VALIDATED, APPROVED, PROCESSED
+  dataQualityScore  Float?
+  entries           PayrollEntry[]
+  xpEvents          XpEvent[]
+}
+
+model PayrollEntry {
+  id               Int          @id @default(autoincrement())
+  batch            PayrollBatch @relation(fields: [batchId], references: [id])
+  batchId          Int
+  employee         Employee     @relation(fields: [employeeId], references: [id])
+  employeeId       Int
+  grossSalary      Float
+  deductionsTotal  Float
+  loansTotal       Float
+  netSalary        Float
+  bankStatus       String       @default("ACTIVE") // BankStatus: ACTIVE, INVALID, MISSING
+  validationStatus String       @default("OK") // ValidationStatus: OK, WARNING, ERROR
+  issues           String?      // JSON string of issues
+  createdAt        DateTime     @default(now())
+  alerts           Alert[]
+}
+
+model Alert {
+  id             Int           @id @default(autoincrement())
+  type           String        // AlertType: IQAMA_EXPIRY, MISSING_DOCUMENT, PAYROLL_ERROR, BANK_ISSUE, DATA_QUALITY
+  severity       String        // AlertSeverity: INFO, WARNING, CRITICAL
+  title          String
+  description    String
+  employee       Employee?     @relation(fields: [employeeId], references: [id])
+  employeeId     Int?
+  payrollEntry   PayrollEntry? @relation(fields: [payrollEntryId], references: [id])
+  payrollEntryId Int?
+  status         String        @default("OPEN") // AlertStatus: OPEN, RESOLVED
+  createdAt      DateTime      @default(now())
+  resolvedAt     DateTime?
+  resolvedBy     User?         @relation("AlertResolvedBy", fields: [resolvedById], references: [id])
+  resolvedById   Int?
+}
+
+model XpEvent {
+  id                Int           @id @default(autoincrement())
+  user              User          @relation(fields: [userId], references: [id])
+  userId            Int
+  eventType         String        // XpEventType: FIXED_ALERT, CLEAN_UPLOAD, IMPROVED_QUALITY, COMPLETED_PROFILE
+  xpPoints          Int
+  relatedEmployee   Employee?     @relation(fields: [relatedEmployeeId], references: [id])
+  relatedEmployeeId Int?
+  relatedBatch      PayrollBatch? @relation(fields: [relatedBatchId], references: [id])
+  relatedBatchId    Int?
+  createdAt         DateTime      @default(now())
+}
+

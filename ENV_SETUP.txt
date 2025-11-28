@@ -1,0 +1,23 @@
+===============================================
+Castello Coffee Platform - Environment Setup
+===============================================
+
+1. Create a file named ".env" in the project root
+
+2. Add this content to .env:
+
+DATABASE_URL="file:./prisma/dev.db"
+NEXTAUTH_SECRET="castello-coffee-secure-secret-key-change-in-production"
+NEXTAUTH_URL="http://localhost:3000"
+
+3. Run: npm run dev
+
+4. Open: http://localhost:3000
+
+5. Login with:
+   CEO: ceo@castello.com / castello123
+   HR:  hr@castello.com / castello123
+
+===============================================
+
+
