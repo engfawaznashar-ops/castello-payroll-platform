@@ -2,8 +2,13 @@ import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { auth } from '@/lib/auth'
 
-export const GET = auth(async (req, { params }: { params: { id: string } }) => {
-  if (!req.auth) {
+export async function GET(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
+  const session = await auth()
+  
+  if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -105,4 +110,4 @@ export const GET = auth(async (req, { params }: { params: { id: string } }) => {
     console.error('Error fetching employee:', error)
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
-})
+}

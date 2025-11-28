@@ -8,7 +8,7 @@ import { EmployeeTable } from '@/components/EmployeeTable'
 export default function EmployeesPage() {
   const { data: employees, isLoading } = useQuery({
     queryKey: ['employees'],
-    queryFn: getEmployees,
+    queryFn: () => getEmployees(),
   })
 
   if (isLoading) {

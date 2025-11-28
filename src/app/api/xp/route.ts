@@ -34,12 +34,14 @@ const calculateLevel = (totalXp: number) => {
   }
 }
 
-export const GET = auth(async (req) => {
-  if (!req.auth || !req.auth.user?.id) {
+export async function GET(req: Request) {
+  const session = await auth()
+  
+  if (!session || !session.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const userId = parseInt(req.auth.user.id)
+  const userId = parseInt(session.user.id)
 
   try {
     // Sum all XP points for this user
@@ -80,4 +82,4 @@ export const GET = auth(async (req) => {
     console.error('Error fetching XP data:', error)
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
-})
+}

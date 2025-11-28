@@ -188,28 +188,28 @@ export async function getKPIData(): Promise<KPIData[]> {
       value: data.totalSalaries,
       change: data.changes?.salariesChange || 0,
       changeType: (data.changes?.salariesChange || 0) >= 0 ? 'increase' : 'decrease',
-      iconName: 'DollarSign',
+      icon: 'DollarSign',
     },
     {
       label: 'إجمالي الخصومات',
       value: data.totalDeductions,
       change: Math.abs(data.changes?.deductionsChange || 0),
       changeType: (data.changes?.deductionsChange || 0) >= 0 ? 'increase' : 'decrease',
-      iconName: 'MinusCircle',
+      icon: 'MinusCircle',
     },
     {
       label: 'إجمالي السلف',
       value: data.totalAdvances,
       change: Math.abs(data.changes?.advancesChange || 0),
       changeType: (data.changes?.advancesChange || 0) >= 0 ? 'increase' : 'decrease',
-      iconName: 'TrendingUp',
+      icon: 'TrendingUp',
     },
     {
       label: 'صافي الرواتب',
       value: data.netSalaries,
       change: Math.abs(data.changes?.netChange || 0),
       changeType: (data.changes?.netChange || 0) >= 0 ? 'increase' : 'decrease',
-      iconName: 'Wallet',
+      icon: 'Wallet',
     },
   ]
 }

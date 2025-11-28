@@ -2,8 +2,10 @@ import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { auth } from '@/lib/auth'
 
-export const GET = auth(async (req) => {
-  if (!req.auth) {
+export async function GET(req: Request) {
+  const session = await auth()
+  
+  if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -78,5 +80,4 @@ export const GET = auth(async (req) => {
     console.error('Error fetching employees:', error)
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
-})
-
+}
