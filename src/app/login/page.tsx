@@ -20,24 +20,46 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      const result = await signIn('credentials', {
+      console.log('[Login] Starting sign in...')
+      
+      // Add timeout to prevent hanging
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Timeout')), 30000)
+      )
+      
+      const signInPromise = signIn('credentials', {
         email,
         password,
         redirect: false
       })
 
+      const result = await Promise.race([signInPromise, timeoutPromise]) as any
+
+      console.log('[Login] Sign in result:', result)
+
       if (result?.error) {
+        console.error('[Login] Sign in error:', result.error)
         setError('البريد الإلكتروني أو كلمة المرور غير صحيحة')
         setLoading(false)
         return
       }
 
       if (result?.ok) {
+        console.log('[Login] Sign in successful, redirecting...')
         router.push('/dashboard')
         router.refresh()
+      } else {
+        console.warn('[Login] Unexpected result:', result)
+        setError('حدث خطأ غير متوقع')
+        setLoading(false)
       }
     } catch (err) {
-      setError('حدث خطأ أثناء تسجيل الدخول')
+      console.error('[Login] Exception:', err)
+      if (err instanceof Error && err.message === 'Timeout') {
+        setError('انتهت مهلة الاتصال. يرجى المحاولة مرة أخرى.')
+      } else {
+        setError('حدث خطأ أثناء تسجيل الدخول')
+      }
       setLoading(false)
     }
   }

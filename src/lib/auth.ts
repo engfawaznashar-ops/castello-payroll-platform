@@ -13,6 +13,7 @@ export const authOptions: NextAuthOptions = {
         password: { label: 'Password', type: 'password' }
       },
       async authorize(credentials) {
+        const startTime = Date.now()
         try {
           console.log('[NextAuth] Authorize attempt for:', credentials?.email)
           
@@ -21,14 +22,24 @@ export const authOptions: NextAuthOptions = {
             return null
           }
 
-          // Test database connection
+          // Test database connection with timeout
           console.log('[NextAuth] Testing database connection...')
-          await prisma.$connect()
+          const connectPromise = prisma.$connect()
+          const connectTimeout = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Database connection timeout')), 10000)
+          )
+          await Promise.race([connectPromise, connectTimeout])
           console.log('[NextAuth] Database connected successfully')
 
-          const user = await prisma.user.findUnique({
+          // Find user with timeout
+          console.log('[NextAuth] Looking up user...')
+          const userPromise = prisma.user.findUnique({
             where: { email: credentials.email }
           })
+          const userTimeout = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('User query timeout')), 10000)
+          )
+          const user = await Promise.race([userPromise, userTimeout]) as any
 
           if (!user) {
             console.log('[NextAuth] User not found:', credentials.email)
@@ -40,6 +51,7 @@ export const authOptions: NextAuthOptions = {
             return null
           }
 
+          console.log('[NextAuth] Verifying password...')
           const isPasswordValid = await bcrypt.compare(
             credentials.password,
             user.passwordHash
@@ -50,7 +62,8 @@ export const authOptions: NextAuthOptions = {
             return null
           }
 
-          console.log('[NextAuth] Authentication successful for:', user.email)
+          const duration = Date.now() - startTime
+          console.log(`[NextAuth] Authentication successful for: ${user.email} (${duration}ms)`)
           return {
             id: user.id.toString(),
             email: user.email,
@@ -58,7 +71,8 @@ export const authOptions: NextAuthOptions = {
             role: user.role
           }
         } catch (error) {
-          console.error('[NextAuth] Authorization error:', error)
+          const duration = Date.now() - startTime
+          console.error(`[NextAuth] Authorization error after ${duration}ms:`, error)
           console.error('[NextAuth] Error details:', {
             name: error instanceof Error ? error.name : 'Unknown',
             message: error instanceof Error ? error.message : String(error),
