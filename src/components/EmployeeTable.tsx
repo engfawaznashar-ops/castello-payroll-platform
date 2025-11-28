@@ -212,7 +212,7 @@ export function EmployeeTable({ employees }: EmployeeTableProps) {
                 {/* Advances - Soft Red */}
                 <td className="px-3 py-2.5">
                   <span className="text-sm font-semibold bg-gradient-to-l from-red-500 to-rose-500 bg-clip-text text-transparent">
-                    {formatCurrency(employee.advances)}
+                    {formatCurrency(employee.advances || 0)}
                   </span>
                 </td>
                 

@@ -22,32 +22,37 @@ export interface Employee {
   email: string
   avatar?: string
   position: string
-  branch: Branch
-  nationality: Nationality
+  branch: string // Changed from Branch to string (API returns string)
+  branchCity?: string // Added for API response
+  nationality: string // Changed from Nationality to string (API returns string)
   iqamaNumber: string
-  iqamaExpiry: string
+  iqamaExpiry?: string // Made optional (not in API)
   passportNumber?: string
   passportExpiry?: string
   hireDate: string
   bankAccount: string
-  bankName: string
+  bankName?: string // Made optional (not in API)
   baseSalary: number
   allowances: number
-  advances: number
+  advances?: number // Made optional (not in API)
   deductions: number
   netSalary: number
   completionPercentage: number
-  phone: string
+  phone?: string // Made optional (not in API)
+  status?: string // Added from API
   documents: DocumentStatus[]
+  payrollHistory?: PayrollHistory[] // Added from API
   alerts: Alert[]
 }
 
 export interface DocumentStatus {
-  type: DocumentType
-  status: 'valid' | 'expiring' | 'expired' | 'missing'
+  id: string // Added from API
+  type: string // Changed from DocumentType to string (API returns string)
+  name: string // Added from API
+  status: 'valid' | 'expiring_soon' | 'expired' | 'missing' | 'expiring' // Added expiring_soon
+  issueDate?: string // Added from API
   expiryDate?: string
-  uploadDate?: string
-  url?: string
+  fileUrl?: string // Changed from url to fileUrl to match API
 }
 
 export interface PayrollData {

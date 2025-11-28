@@ -136,24 +136,32 @@ export const employees: Employee[] = Array.from({ length: 70 }, (_, i) => {
   
   const documents: DocumentStatus[] = [
     {
+      id: `${i + 1}-1`,
       type: 'جواز السفر',
+      name: 'جواز السفر',
       status: Math.random() > 0.8 ? 'expiring' : 'valid',
       expiryDate: new Date(2025, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1).toISOString(),
-      uploadDate: new Date(2023, 5, 15).toISOString(),
+      issueDate: new Date(2023, 5, 15).toISOString(),
     },
     {
+      id: `${i + 1}-2`,
       type: 'الإقامة',
+      name: 'الإقامة',
       status: Math.random() > 0.7 ? (Math.random() > 0.5 ? 'expiring' : 'expired') : 'valid',
       expiryDate: new Date(2025, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1).toISOString(),
-      uploadDate: new Date(2023, 8, 10).toISOString(),
+      issueDate: new Date(2023, 8, 10).toISOString(),
     },
     {
+      id: `${i + 1}-3`,
       type: 'عقد العمل',
+      name: 'عقد العمل',
       status: 'valid',
-      uploadDate: new Date(2023, 4, 20).toISOString(),
+      issueDate: new Date(2023, 4, 20).toISOString(),
     },
     {
+      id: `${i + 1}-4`,
       type: 'شهادة الصحة',
+      name: 'شهادة الصحة',
       status: Math.random() > 0.9 ? 'missing' : 'valid',
       expiryDate: new Date(2025, 11, 31).toISOString(),
     },
