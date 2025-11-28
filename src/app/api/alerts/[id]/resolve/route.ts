@@ -2,12 +2,17 @@ import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { auth } from '@/lib/auth'
 
-export const POST = auth(async (req, { params }: { params: { id: string } }) => {
-  if (!req.auth || !req.auth.user?.id) {
+export async function POST(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
+  const session = await auth()
+  
+  if (!session || !session.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const userId = parseInt(req.auth.user.id)
+  const userId = parseInt(session.user.id)
   const alertId = parseInt(params.id)
 
   try {
@@ -65,4 +70,4 @@ export const POST = auth(async (req, { params }: { params: { id: string } }) => 
     console.error(`Error resolving alert ${alertId}:`, error)
     return NextResponse.json({ error: 'Failed to resolve alert' }, { status: 500 })
   }
-})
+}
